@@ -8,7 +8,13 @@ Keywords: Hospital Management, ERP, Patient Flow, Resource Optimization, AI in H
 
 Abstract
 
-This report presents the design and implementation of MediSync, an integrated Hospital Enterprise Resource Planning (ERP) system developed to address operational challenges at Omega Multispeciality Hospital, Yelahanka. The system leverages modern technologies including Artificial Intelligence, real-time data analytics, and automated scheduling algorithms to optimize hospital operations. Key features include intelligent patient queue management, automated staff rostering, real-time bed occupancy tracking, predictive patient inflow analysis, pharmacy inventory optimization, and emergency triage coordination. The proposed system aims to reduce patient wait times by 40%, improve resource utilization by 35%, and enhance overall patient satisfaction through streamlined processes and data-driven decision making.
+This report presents the design and implementation of MediSync, an integrated Hospital Enterprise Resource Planning (ERP) 
+system developed to address operational challenges at Omega Multispeciality Hospital, Yelahanka. The system leverages modern 
+technologies including Artificial Intelligence, real-time data analytics, and automated scheduling algorithms to optimize 
+hospital operations. Key features include intelligent patient queue management, automated staff rostering, real-time bed 
+occupancy tracking, predictive patient inflow analysis, pharmacy inventory optimization, and emergency triage coordination. 
+The proposed system aims to reduce patient wait times by 40%, improve resource utilization by 35%, and enhance overall 
+patient satisfaction through streamlined processes and data-driven decision making.
 
 
 
