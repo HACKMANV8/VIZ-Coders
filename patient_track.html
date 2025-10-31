@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Track | Hospital System</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #e6f7ff; color: #333; margin: 20px; }
+        .dashboard { max-width: 800px; margin: auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #007bff; text-align: center; }
+        .status-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background-color: #f8f9fa; }
+        .status-card strong { color: #28a745; }
+        #patient-details p { margin: 5px 0; }
+        .queue-step { display: inline-block; padding: 8px 15px; margin-right: 10px; border-radius: 20px; background-color: #ccc; color: white; }
+        .current { background-color: #ffc107; color: #333; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Patient Track Status 👨‍⚕️</h1>
+        <div id="patient-details" class="status-card">
+            <p>Name: **John Doe**</p>
+            <p>Token Number: **T-042**</p>
+            <p>Appointment Number: **A-8851**</p>
+            <p>Doctor Allotment: **Dr. Patel** (Cardiology)</p>
+            <p>Room Allotment: **Room 205**</p>
+            <p>Timing: **10:30 AM**</p>
+        </div>
+
+        <h2>Queue Status</h2>
+        <div id="queue-status">
+            <span class="queue-step">Check-in</span>
+            <span class="queue-step">Billing</span>
+            <span class="queue-step current" id="current-step">Waiting for Doctor</span>
+            <span class="queue-step">Consultation</span>
+            <span class="queue-step">Pharmacy/Lab</span>
+            <span class="queue-step">Check-out</span>
+        </div>
+        
+        <h2>Real-Time Notification</h2>
+        <div class="status-card">
+            <strong><span id="notification-message">Your token T-042 is next to see Dr. Patel in Room 205. Please proceed!</span></strong>
+        </div>
+    </div>
+
+    <script>
+        // *** This JavaScript simulates the real-time update logic ***
+        const statusSteps = ["Waiting for Doctor", "Consultation", "Pharmacy/Lab", "Check-out"];
+        let stepIndex = 0;
+
+        function updateStatus() {
+            // Move the 'current' marker to the next step
+            document.getElementById('current-step').classList.remove('current');
+            
+            stepIndex = (stepIndex + 1) % statusSteps.length;
+            const newStatus = statusSteps[stepIndex];
+
+            const currentStepElement = document.getElementById('current-step');
+            currentStepElement.textContent = newStatus;
+            currentStepElement.classList.add('current');
+            
+            // Update the real-time notification
+            document.getElementById('notification-message').textContent = 
+                `STATUS UPDATE: You are now in the **${newStatus}** stage.`;
+        }
+
+        // Simulates a real-time update every 10 seconds (in a real app, this would be a WebSocket or API call)
+        // setInterval(updateStatus, 10000); 
+
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-step').id = 'step-0'; // give initial step an ID
+            // For the demo, we will manually change the status.
+        });
+    </script>
+</body>
+</html>
