@@ -1,0 +1,28 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": ["Hi", "Hello", "Is anyone there?", "Good day"],
+      "responses": ["Hello! How can I assist with your hospital needs?", "Hi there, how may I help you today?"],
+      "context_set": ""
+    },
+    {
+      "tag": "appointment_request",
+      "patterns": ["I want to book an appointment", "Schedule a visit", "Can I see a doctor", "Book a checkup"],
+      "responses": ["Certainly, which department or specialist are you looking for? (e.g., Cardiology, Pediatrics)", "We can schedule that. What type of medical service is required?"],
+      "context_set": "appointment"
+    },
+    {
+      "tag": "departments",
+      "patterns": ["List of departments", "What specialties do you have", "Departments in hospital"],
+      "responses": ["We have Cardiology, Orthopedics, Neurology, Pediatrics, and General Medicine. Which department are you interested in?"],
+      "context_set": ""
+    },
+    {
+      "tag": "thank_you",
+      "patterns": ["Thanks", "Thank you so much", "Appreciate it"],
+      "responses": ["You're very welcome!", "Happy to help. Is there anything else?"],
+      "context_set": ""
+    }
+  ]
+}
