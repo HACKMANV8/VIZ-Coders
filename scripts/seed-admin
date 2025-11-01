@@ -1,0 +1,100 @@
+import express from "express";
+import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
+import User from "../models/User.js";
+import Patient from "../models/Patient.js";
+import TempRecord from "../models/TempRecord.js";
+import { encryptForDB, decryptFromDB, fingerprintIndex } from "../utils/cryptoUtil.js";
+import { generateToken } from "../utils/jwtUtil.js";
+import { protect } from "../middleware/authMiddleware.js";
+
+const router = express.Router();
+
+// Staff/Doctor registration (admin creates users)
+router.post("/register", async (req, res) => {
+  try {
+    const { username, password, role, name, phone, adminPassword } = req.body;
+    if (!process.env.ADMIN_PASSWORD || adminPassword !== process.env.ADMIN_PASSWORD) {
+      return res.status(403).json({ message: "Admin password required to create staff/doctor users." });
+    }
+    if (!username || !password || !role) return res.status(400).json({ message: "Missing fields" });
+    const existing = await User.findOne({ username });
+    if (existing) return res.status(409).json({ message: "User exists" });
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+    const user = await User.create({ username, passwordHash, role, name, phone });
+    return res.json({ message: "User created", userId: user._id });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Login for staff / doctor
+router.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return res.status(401).json({ message: "Invalid credentials" });
+    const token = generateToken(user);
+    res.json({ token, role: user.role, username: user.username });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Patient registration (public)
+router.post("/patient/register", async (req, res) => {
+  try {
+    const { name, dob, aadhaar, healthCard, fingerprintTemplate } = req.body;
+    if (!name) return res.status(400).json({ message: "Name required" });
+    const patientId = `P${Date.now()}`;
+    const patient = new Patient({
+      patientId,
+      name_encrypted: encryptForDB(name || ""),
+      dob_encrypted: dob ? encryptForDB(dob) : undefined,
+      aadhaar_encrypted: aadhaar ? encryptForDB(aadhaar) : undefined,
+      healthCard_encrypted: healthCard ? encryptForDB(healthCard) : undefined,
+      fingerprint_encrypted: fingerprintTemplate ? encryptForDB(fingerprintTemplate) : undefined,
+      fingerprint_index: fingerprintTemplate ? fingerprintIndex(fingerprintTemplate) : undefined,
+      medicalHistory_encrypted: encryptForDB(JSON.stringify({})),
+    });
+    await patient.save();
+    res.json({ message: "Patient registered", patientId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Fingerprint login for patients using 1:N index (SHA256-based)
+router.post("/patient/fingerprint-login", async (req, res) => {
+  try {
+    const { template } = req.body;
+    if (!template) return res.status(400).json({ message: "Template required" });
+
+    const index = fingerprintIndex(template);
+    // fast lookup by index
+    const patient = await Patient.findOne({ fingerprint_index: index });
+    if (patient) {
+      const payload = { patientId: patient.patientId, role: "patient" };
+      const jwt = generateToken(payload);
+      return res.json({ status: "match", patientId: patient.patientId, token: jwt });
+    }
+
+    return res.json({ status: "no_match" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Protected route: get logged-in user info (for staff)
+router.get("/me", protect(), (req, res) => {
+  res.json({ user: req.user });
+});
+
+export default router;
